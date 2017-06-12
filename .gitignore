@@ -34,3 +34,4 @@ RTS/Temp/*
 RTS/Library/*
 RTS/obj/*
 RTS/Assets/Models/Downloads/*
+*.meta
