@@ -44,11 +44,13 @@ class UnitControl : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             var target = this.ClickResult();
-            if (target.transform != null && target.transform.name == "Terrain")
-                MoveTo(target.point);
-            else
-                MoveTo(target.point);
-            //if (target.transform != null && target.transform.name == "Terrain") MoveTo(target.transform.position);
+            if (target.transform != null)
+            {
+                if (target.transform.name == "Terrain")
+                    MoveTo(target.point);
+                else
+                    MoveTo(target.transform.gameObject);
+            }
         }
     }
 
@@ -80,7 +82,7 @@ class UnitControl : MonoBehaviour
         if (this.SelectedUnits.Count > 0)
         {
             foreach(Transform unit in this.PlayersUnitsRoot.transform)
-                unit.GetComponent<Unit>().TurnOffSelection();
+                unit.GetComponent<PlayerUnit>().TurnOffSelection();
 
             this.SelectedUnits.Clear();
         }
@@ -108,6 +110,12 @@ class UnitControl : MonoBehaviour
     {
         foreach (var selectedUnit in this.SelectedUnits)
             selectedUnit.GetComponent<Unit>().SetTarget(position);
+    }
+
+    void MoveTo(GameObject go)
+    {
+        foreach (var selectedUnit in this.SelectedUnits)
+            selectedUnit.GetComponent<Unit>().SetTarget(go);
     }
 
     RaycastHit ClickResult()
