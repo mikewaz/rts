@@ -28,3 +28,9 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+#Myself
+RTS/Temp/*
+RTS/Library/*
+RTS/obj/*
+RTS/Assets/Models/Downloads/*
