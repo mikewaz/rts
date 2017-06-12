@@ -5,9 +5,9 @@ public class PlayerUnit : Unit
 {
     void Start()
     {
-        this.enemyTag = "Enemy";
+        this.enemyTag = "Enemy's Unit";
         this.agent = this.gameObject.GetComponent<NavMeshAgent>();
-        this.agent.stoppingDistance = this.RadiusOfAttack;
+        this.agent.stoppingDistance = this.RadiusOfAttack + this.transform.GetComponent<CapsuleCollider>().radius;
     }
 
     public void TurnOffSelection()

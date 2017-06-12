@@ -7,6 +7,6 @@ public class EnemyUnit : Unit
     {
         this.enemyTag = "Player Unit";
         this.agent = this.gameObject.GetComponent<NavMeshAgent>();
-        this.agent.stoppingDistance = this.RadiusOfAttack;
+        this.agent.stoppingDistance = this.RadiusOfAttack + this.transform.GetComponent<CapsuleCollider>().radius;
     }
 }
