@@ -2,27 +2,53 @@
 
 public class Unit : MonoBehaviour
 {
-    NavMeshAgent _agent;
-    Transform _target;
+    [Range(0.5f, 100f)]
+    public float RadiusOfAttack;
+    public int Health;
 
-    // Use this for initialization
-    void Start()
+    GameObject _target;
+    bool _isArived;
+    protected NavMeshAgent agent;
+    protected string enemyTag;
+
+
+    void Update()
     {
-        this._agent = GetComponent<NavMeshAgent>();
+        if (this.agent.remainingDistance <= this.RadiusOfAttack)
+        {
+            if (this._target != null)
+            {
+                if (this._target.tag == enemyTag)
+                    Attack();
+                else
+                    this._target = null;
+            }
+        }
+
+        if (this._target != null)
+        {
+            this.agent.SetDestination(this._target.transform.position);
+        }
     }
+
 
     public void SetTarget(Vector3 target)
     {
-        this._agent.SetDestination(target);
+        this.agent.SetDestination(target);
     }
+
 
     public void SetTarget(GameObject target)
     {
-        this._agent.SetDestination(target.transform.position);
+        this._isArived = false;
+        this._target = target.gameObject;
+        this.agent.SetDestination(target.transform.position);
     }
 
-    public void TurnOffSelection()
+
+    private void Attack()
     {
-        this.transform.FindChild("Selected").gameObject.SetActive(false);
+
     }
+
 }
