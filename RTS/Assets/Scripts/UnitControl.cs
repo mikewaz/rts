@@ -4,7 +4,9 @@ using UnityEngine;
 
 class UnitControl : MonoBehaviour
 {
+    [HideInInspector]
     public List<GameObject> SelectedUnits { get; private set; }
+    public GameObject PlayersUnitsRoot;
 
     bool _isSelecting = false;
     Vector3 _mousePosition;
@@ -20,9 +22,8 @@ class UnitControl : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            this.SelectedUnits.Clear();
-            foreach (var unit in GameObject.FindGameObjectsWithTag("Player Unit").ToList())
-                unit.GetComponent<Unit>().TurnOffSelection();
+            UnselectUnits();
+
             this._isSelecting = true;
             this._mousePosition = Input.mousePosition;
         }
@@ -30,7 +31,7 @@ class UnitControl : MonoBehaviour
         {
             this._isSelecting = false;
             SelectUnits();
-        } 
+        }
 
         #endregion
 
@@ -64,6 +65,17 @@ class UnitControl : MonoBehaviour
         }
     }
 
+    void UnselectUnits()
+    {
+        if (this.SelectedUnits.Count > 0)
+        {
+            for (var i = 0; i < this.PlayersUnitsRoot.transform.childCount; i++)
+                this.PlayersUnitsRoot.transform.GetChild(i).GetComponent<Unit>().TurnOffSelection();
+
+            this.SelectedUnits.Clear();
+        }
+    }
+
     void MoveTo(Vector3 position)
     {
         foreach (var selectedUnit in this.SelectedUnits)
@@ -88,7 +100,6 @@ class UnitControl : MonoBehaviour
             return false;
     }
 
-    // ReSharper disable once InconsistentNaming
     void OnGUI()
     {
         if (this._isSelecting)
