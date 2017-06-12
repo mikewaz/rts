@@ -1,24 +1,29 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class CameraControl : MonoBehaviour {
+public class CameraControl : MonoBehaviour
+{
 
-    private const float MoveSpeed = 0.2f;
-    private const float ZoomSpeed = 0.5f;
-    private float ClickPose = 0;
+    const float MoveSpeed = 0.2f;
+    const float ZoomSpeed = 0.5f;
+    float _clickPose;
 
     // Use this for initialization
-    void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    void Start()
+    {
+        this._clickPose = 0.0f;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
         KeybordControl();
         MouseControl();
     }
 
-    private void KeybordControl()
+    void KeybordControl()
     {
         if (Input.GetKey(KeyCode.W))
             MoveCamera(Vector2.up);
@@ -30,41 +35,44 @@ public class CameraControl : MonoBehaviour {
             MoveCamera(Vector2.right);
     }
 
-    private void MouseControl()
+    void MouseControl()
     {
+        #region Camera rotation
         if (Input.GetMouseButtonDown(2))
-            this.ClickPose = Input.mousePosition.x;
+            this._clickPose = Input.mousePosition.x;
         if (Input.GetMouseButtonUp(2))
-            this.ClickPose = 0;
-        if (this.ClickPose != 0)
+            this._clickPose = 0.0F;
+        if (this._clickPose != 0.0F)
             TurnCamera();
+        #endregion
+
+        #region Camera zooming
         if (Input.GetAxis("Mouse ScrollWheel") > 0)
             ZoomCamera(false);
         if (Input.GetAxis("Mouse ScrollWheel") < 0)
             ZoomCamera(true);
-
+        #endregion
     }
 
-    private void TurnCamera()
+    void TurnCamera()
     {
-        var clickDelta = Input.mousePosition.x - this.ClickPose;
+        var clickDelta = Input.mousePosition.x - this._clickPose;
         var minClickDelta = Screen.width / 10;
-        var TurnSpeed = CalculateSpeedOfRotation(minClickDelta, clickDelta);
+        var turnSpeed = CalculateSpeedOfRotation(minClickDelta, clickDelta);
 
         if (clickDelta > minClickDelta)
-            this.transform.RotateAround(this.transform.position, Vector3.up, TurnSpeed * Time.deltaTime);
+            this.transform.RotateAround(this.transform.position, Vector3.up, turnSpeed * Time.deltaTime);
         if (clickDelta < -1 * minClickDelta)
-            this.transform.RotateAround(this.transform.position, Vector3.up, -1 * TurnSpeed * Time.deltaTime);
+            this.transform.RotateAround(this.transform.position, Vector3.up, -1 * turnSpeed * Time.deltaTime);
     }
 
-    private void MoveCamera(Vector2 side)
+    void MoveCamera(Vector2 side)
     {
         this.transform.position += new Vector3(side.x * MoveSpeed, 0, side.y * MoveSpeed);
     }
 
-    private void ZoomCamera(bool isDistancing)
+    void ZoomCamera(bool isDistancing)
     {
-        var currentPos = this.transform.position;
         if (isDistancing)
         {
             this.transform.position += new Vector3(0, ZoomSpeed, -1 * ZoomSpeed);
@@ -75,7 +83,7 @@ public class CameraControl : MonoBehaviour {
         }
     }
 
-    private float CalculateSpeedOfRotation(float step, float clickDelta)
+    static float CalculateSpeedOfRotation(float step, float clickDelta)
     {
         var speedOfRotation = 0f;
         var currentStep = 0f;
