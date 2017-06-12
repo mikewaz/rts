@@ -27,6 +27,12 @@ class UnitControl : MonoBehaviour
             this._isSelecting = true;
             this._mousePosition = Input.mousePosition;
         }
+
+        if (Input.GetMouseButton(0))
+        {
+            HighlightUnits();
+        }
+
         if (Input.GetMouseButtonUp(0))
         {
             this._isSelecting = false;
@@ -46,6 +52,40 @@ class UnitControl : MonoBehaviour
         }
     }
 
+    void HighlightUnits()
+    {
+        RaycastHit hit1;
+        RaycastHit hit2;
+        var firstPoint = this.GetComponent<Camera>().ScreenPointToRay(this._mousePosition);
+        var secondPoint = this.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+
+        if (!Physics.Raycast(firstPoint, out hit1) || !Physics.Raycast(secondPoint, out hit2))
+            return;
+
+        foreach (Transform unit in this.PlayersUnitsRoot.transform)
+        {
+            if (!InSelectedArea(unit.gameObject, hit1.point, hit2.point))
+            {
+                unit.FindChild("Selected").gameObject.SetActive(false);
+            }
+            else
+            {
+                unit.FindChild("Selected").gameObject.SetActive(true);
+            }
+        }
+    }
+
+    void UnselectUnits()
+    {
+        if (this.SelectedUnits.Count > 0)
+        {
+            foreach(Transform unit in this.PlayersUnitsRoot.transform)
+                unit.GetComponent<Unit>().TurnOffSelection();
+
+            this.SelectedUnits.Clear();
+        }
+    }
+
     void SelectUnits()
     {
         RaycastHit hit1;
@@ -56,23 +96,11 @@ class UnitControl : MonoBehaviour
         if (!Physics.Raycast(firstPoint, out hit1) || !Physics.Raycast(secondPoint, out hit2))
             return;
 
-        var units = GameObject.FindGameObjectsWithTag("Player Unit").ToList();
-        foreach (var unit in units)
+        foreach (Transform unit in this.PlayersUnitsRoot.transform)
         {
-            if (!InSelectedArea(unit, hit1.point, hit2.point)) continue;
+            if (!InSelectedArea(unit.gameObject, hit1.point, hit2.point)) continue;
             unit.transform.FindChild("Selected").gameObject.SetActive(true);
-            this.SelectedUnits.Add(unit);
-        }
-    }
-
-    void UnselectUnits()
-    {
-        if (this.SelectedUnits.Count > 0)
-        {
-            for (var i = 0; i < this.PlayersUnitsRoot.transform.childCount; i++)
-                this.PlayersUnitsRoot.transform.GetChild(i).GetComponent<Unit>().TurnOffSelection();
-
-            this.SelectedUnits.Clear();
+            this.SelectedUnits.Add(unit.gameObject);
         }
     }
 
@@ -89,24 +117,29 @@ class UnitControl : MonoBehaviour
         return hit;
     }
 
-    static bool InSelectedArea(GameObject unit, Vector3 fPoint, Vector3 sPoint)
-    {
-        if (unit.transform.position.x >= Mathf.Min(fPoint.x, sPoint.x) &&
-            unit.transform.position.x <= Mathf.Max(fPoint.x, sPoint.x) &&
-            unit.transform.position.z >= Mathf.Min(fPoint.z, sPoint.z) &&
-            unit.transform.position.z <= Mathf.Max(fPoint.z, sPoint.z))
-            return true;
-        else
-            return false;
-    }
-
-    void OnGUI()
+    private void OnGUI()
     {
         if (this._isSelecting)
         {
             var rect = Utils.GetScreenRect(_mousePosition, Input.mousePosition);
             Utils.DrawScreenRect(rect, new Color(0.8f, 0.8f, 0.95f, 0.25f));
             Utils.DrawScreenRectBorder(rect, 2, new Color(0.8f, 0.8f, 0.95f));
+        }
+    }
+
+    static bool InSelectedArea(GameObject unit, Vector3 fPoint, Vector3 sPoint)
+    {
+        var radius = unit.GetComponent<CapsuleCollider>().radius - 0.3f;
+        if (unit.transform.position.x + radius >= Mathf.Min(fPoint.x, sPoint.x) &&
+            unit.transform.position.x - radius <= Mathf.Max(fPoint.x, sPoint.x) &&
+            unit.transform.position.z + radius >= Mathf.Min(fPoint.z, sPoint.z) &&
+            unit.transform.position.z - radius <= Mathf.Max(fPoint.z, sPoint.z))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 }
