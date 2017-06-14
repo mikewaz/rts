@@ -18,6 +18,7 @@ public abstract class Unit : Subject
     public CapsuleCollider Collired;
 
     #endregion
+
     #region Private methods
 
     private void Start()
@@ -36,6 +37,7 @@ public abstract class Unit : Subject
     }
 
     #endregion
+
     #region Public methods
 
     public void SetTarget(GameObject target)
@@ -58,6 +60,7 @@ public abstract class Unit : Subject
 
 
     #endregion
+
     #region Protected virtual methods
 
     protected virtual void SelectOperation()
@@ -66,19 +69,21 @@ public abstract class Unit : Subject
             return;
 
         if ((this.transform.position - this.Target.transform.position).magnitude > 
-            this.navMeshAgent.stoppingDistance + this.GetComponent<CapsuleCollider>().radius +
-            this.Target.GetComponent<CapsuleCollider>().radius)
+              this.navMeshAgent.stoppingDistance + this.GetComponent<CapsuleCollider>().radius +
+              this.Target.GetComponent<CapsuleCollider>().radius)
         {
             if (this.navMeshAgent.pathEndPosition != this.Target.transform.position)
                 this.navMeshAgent.SetDestination(this.Target.transform.position);
         }
         else
         {
+            this.navMeshAgent.ResetPath();
             MainAction();
         }
     }
 
     #endregion
+
     #region Protected methods
 
     protected abstract void MainAction();
