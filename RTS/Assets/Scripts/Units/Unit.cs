@@ -36,6 +36,57 @@ public abstract class Unit : Subject
         SelectOperation();
     }
 
+    private void TargetDied()
+    {
+        Debug.Log("Targer deid");
+        this.Target = null;
+    }
+
+    private bool TurnTowardsTheTarget()
+    {
+        if (this.Target == null) return false;
+
+        var gip = (this.Target.transform.position - this.transform.position).magnitude;
+        var kat = this.Target.transform.position.z - this.transform.position.z;
+        var ralpha = Mathf.Asin(kat / gip);
+        var alpha = ralpha * (180 / Mathf.PI);        
+
+        var s = 1f;
+        alpha = alpha > 0 ? alpha : 360 - Mathf.Abs(alpha);
+
+        var unitVector = this.transform.position;
+        var targetVectory = this.Target.transform.position;
+
+        if (unitVector.z >= targetVectory.z && unitVector.x > targetVectory.x)
+        {
+            //Debug.Log(1);
+            alpha = alpha - 90;
+            s = -1f;
+        }
+        if (unitVector.z >= targetVectory.z && unitVector.x < targetVectory.x)
+        {
+            //Debug.Log(2);
+            alpha = alpha - 180;
+            s = 1f;
+        }
+        if (unitVector.z < targetVectory.z && unitVector.x >= targetVectory.x)
+        {
+            //Debug.Log(3);
+            alpha = 270 + alpha;
+            s = -1f;
+        }
+
+        if (this.transform.rotation.eulerAngles.y < alpha - 1 || this.transform.rotation.eulerAngles.y > alpha + 1)
+        {
+            this.transform.Rotate(0, s, 0);
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     #endregion
 
     #region Public methods
@@ -44,12 +95,6 @@ public abstract class Unit : Subject
     {
         this.Target = target;
         target.GetComponent<Subject>().Died += this.TargetDied;
-    }
-
-    private void TargetDied()
-    {
-        Debug.Log("Targer deid");
-        this.Target = null;
     }
 
     public void SetTarget(Vector3 position)
@@ -68,7 +113,7 @@ public abstract class Unit : Subject
         if (this.Target == null)
             return;
 
-        if ((this.transform.position - this.Target.transform.position).magnitude > 
+        if ((this.transform.position - this.Target.transform.position).magnitude >
               this.navMeshAgent.stoppingDistance + this.GetComponent<CapsuleCollider>().radius +
               this.Target.GetComponent<CapsuleCollider>().radius)
         {
@@ -78,7 +123,8 @@ public abstract class Unit : Subject
         else
         {
             this.navMeshAgent.ResetPath();
-            MainAction();
+            if(TurnTowardsTheTarget())
+                MainAction();
         }
     }
 
