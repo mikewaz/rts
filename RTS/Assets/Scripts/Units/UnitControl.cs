@@ -11,6 +11,8 @@ class UnitControl : MonoBehaviour
     bool _isSelecting = false;
     Vector3 _mousePosition;
 
+    public GameObject enemy;
+
     void Start()
     {
         this.SelectedUnits = new List<GameObject>();
@@ -81,8 +83,8 @@ class UnitControl : MonoBehaviour
     {
         if (this.SelectedUnits.Count > 0)
         {
-            foreach(Transform unit in this.PlayersUnitsRoot.transform)
-                unit.GetComponent<PlayerUnit>().TurnOffSelection();
+            //foreach(Transform unit in this.PlayersUnitsRoot.transform)
+            //    unit.GetComponent<PlayerUnit>().TurnOffSelection();
 
             this.SelectedUnits.Clear();
         }
@@ -112,10 +114,12 @@ class UnitControl : MonoBehaviour
             selectedUnit.GetComponent<Unit>().SetTarget(position);
     }
 
-    void MoveTo(GameObject go)
+    void MoveTo(GameObject target)
     {
         foreach (var selectedUnit in this.SelectedUnits)
-            selectedUnit.GetComponent<Unit>().SetTarget(go);
+        {
+            selectedUnit.GetComponent<Unit>().SetTarget(target);
+        }
     }
 
     RaycastHit ClickResult()
