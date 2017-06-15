@@ -1,25 +1,15 @@
 ﻿using System;
 using UnityEngine;
 
-public class WarriorUnit : Unit
+public abstract class WarriorUnit : Unit
 {
     [Range(1f, 100f)]
     public int Damage;
 
-    protected override void MainAction()
+    protected int CalculateTheDamage()
     {
-        this.DelayOfAction += Time.deltaTime;
-        if (this.DelayOfAction >= this.SpeedOfAction)
-        {
-            this.DelayOfAction = 0;
-            var damage = CalculateTheDamage();
-            this.Target.GetComponent<Subject>().MakeDamage(damage);
-        }
-    }
-
-    private int CalculateTheDamage()
-    {
-        Debug.Log("Attack");
         return this.Damage;
     }
+
+    protected abstract override void MainAction();
 }
